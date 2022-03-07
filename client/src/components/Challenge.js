@@ -4,47 +4,24 @@ const axios = require("axios");
 
 export default function Challenge() {
   
-  const [items, setItems] = useState();
-  const [lowestPrice, setLowestPrice] = useState(0);
+  const [lowStock, setLowStock] = useState({
+    data: '',
+    loading: true
+  });
+  const [restockCost, setRestockCost] = useState([]);
   
-  const getOutOfStock = () => {
-    axios.get("http://localhost:4567/low-stock").then(function (response){
-      setItems(response.data);
-    }).catch(function(error){});
-  }
-
-  const getLowestStock = () => {
-    let getRestock = items.map((item) => {
-      return {
-        itemName: item.name,
-        amount: item.orderAmount ? item.orderAmount: 0
-      }
+  const handleClickLowStock = async() => {
+    const data = await axios.get('http://localhost:4567/low-stock');
+    setLowStock({
+      data: data.data,
+      loading: false
     });
-    axios({
-      method: "post",
-      url: "http://localhost:4567/restock-cost",
-      data: getRestock
-    }).then(function(response){
-      setLowestPrice(response.data);
-    }).catch(function(error){});
   }
 
-   const listItems = items?.map((item) => (
-     <ItemRow 
-       key={item.id}
-       sku={item.id}
-       itemName={item.name}
-       stock={item.stock}
-       capacity={item.capacity}
-       onChange={(e) => {
-         let updateItems = items;
-         updateItems[
-           updateItems.findIndex((itemToUpdate) => itemToUpdate.id === item.id)
-         ].orderAmount = e.target.value;
-         setItems(updateItems);
-       }}
-     />
-   ))
+  const handleClickReorderCost = async() => {
+    const data = await axios.post('http://localhost:4567/restock-cost', lowStock.data);
+    setRestockCost(data.data);
+  }
   
   return (
     <>
@@ -64,17 +41,18 @@ export default function Challenge() {
           will need an input element in the Order Amount column that will take in the order amount and 
           update the application state appropriately.
           */
-          listItems
+          lowStock.loading?'':lowStock.data.map(item => 
+          <ItemRow key={item.id} item={item} lowStock={lowStock} setLowStock={setLowStock} />)
           }
         </tbody>
       </table>
       {/* TODO: Display total cost returned from the server */}
-      <div>Total Cost:{lowestPrice} </div>
+      <div>Total Cost: {Math.round((restockCost + Number.EPSILON) * 100) / 100} </div>
       {/* 
       TODO: Add event handlers to these buttons that use the Java API to perform their relative actions.
       */}
-      <button onClick={getOutOfStock} >Get Low-Stock Items</button>
-      <button onClick={getLowestStock} >Determine Re-Order Cost</button>
+      <button onClick={handleClickLowStock}>Get Low-Stock Items</button>
+      <button onClick={handleClickReorderCost}>Calculate Re-Stock Cost</button>
     </>
   );
 }
