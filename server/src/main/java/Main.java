@@ -23,7 +23,7 @@ public class Main {
         Inventory inventory = new Inventory();
         Distributors distributors = new Distributors();
 
-        final double stockThreshold = 0.25;
+        final double percentageUnder = 0.25;
 
         // This is required to allow GET and POST requests with the header
         // 'content-type'
@@ -43,7 +43,7 @@ public class Main {
 
         // Return JSON containing the candies for which the stock is less than 25%of
         // it's capacity
-        get("/low-stock", (request, response) -> inventory.getItemsUnderPercentCapacity(stockThreshold), gson::toJson);
+        get("/low-stock", (request, response) -> inventory.getItemsUnderPercentCapacity(percentageUnder), gson::toJson);
 
         // Return JSON containing the total cost of restocking candy
         post("/restock-cost", (request, response) -> distributors.getRestockCost(request.body()), gson::toJson);

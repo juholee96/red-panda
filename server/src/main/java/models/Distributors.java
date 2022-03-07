@@ -86,15 +86,13 @@ public class Distributors {
      * @return the lowest cost to restock
      */
     public double getRestockCost(String body) {
-        // TODO: implement restock cost
+        // implement restock cost
         Gson gson = new Gson();
         Item[] itemArr = gson.fromJson(body, Item[].class);
         double cost = 0;
 
         for (Item item : itemArr) {
-            // temporarily using cost value from json
             int restockAmount = (int) item.getCost();
-            // ensure within bounds.
             restockAmount = Math.min(restockAmount, item.getCapacity() - item.getStock());
             double cheapestCost = Double.MAX_VALUE;
 

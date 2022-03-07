@@ -79,10 +79,9 @@ public class Inventory {
     }
 
     /**
-     * Find all items with a stock under a provided percent capacity
-     *
-     * @param percent the percent threshold to use in determining items under the
-     *                given capacity requirement
+     * The /low-stock endpoint should return only the items that are at less than
+     * 25% capacity.
+     * 
      * @return a list of items that have a stock that are under a percentage of
      *         their max capacity
      */
@@ -90,7 +89,6 @@ public class Inventory {
         List<Item> itemsUnderStocked = new ArrayList<>();
         for (Item item : inventory) {
             double percentCapacity = (double) item.getStock() / item.getCapacity();
-
             if (percentCapacity < percent) {
                 itemsUnderStocked.add(item);
             }
